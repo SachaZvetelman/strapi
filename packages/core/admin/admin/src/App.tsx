@@ -5,6 +5,7 @@
  */
 
 import * as React from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { SkipToContent } from '@strapi/design-system';
 import {
@@ -20,6 +21,9 @@ import merge from 'lodash/merge';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import { Route, Switch } from 'react-router-dom';
+import * as rrweb from 'rrweb';
+import rrwebPlayer from 'rrweb-player';
+import 'rrweb-player/dist/style.css';
 
 import {
   ConfigurationProvider,
@@ -46,7 +50,30 @@ interface AppProps extends Omit<ConfigurationProviderProps, 'children' | 'authLo
   menuLogo: string;
 }
 
+let events = [];
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ReplayComponent = ({ events }: any[]) => {
+  // eslint-disable-next-line no-console
+  console.log(events);
+  const playerRef = useRef();
+
+  useEffect(() => {
+    if (playerRef.current && events) {
+      new rrwebPlayer({
+        target: playerRef.current, // the DOM element where the player will append
+        props: {
+          events,
+        },
+      });
+    }
+  }, [events]);
+
+  return <div ref={playerRef} />;
+};
+
 export const App = ({ authLogo, menuLogo, showReleaseNotification, showTutorials }: AppProps) => {
+  const [shouldShowReplay, setShouldShowReplay] = useState(false);
   const adminPermissions = useEnterprise(
     ADMIN_PERMISSIONS_CE,
     async () => (await import('../../ee/admin/src/constants')).ADMIN_PERMISSIONS_EE,
@@ -190,12 +217,44 @@ export const App = ({ authLogo, menuLogo, showReleaseNotification, showTutorials
     [uuid, telemetryProperties, deviceId]
   );
 
+  useEffect(() => {
+    rrweb.record({
+      emit(event) {
+        // Here you can store the event data
+        // For example, sending it to a server or storing in state
+        // eslint-disable-next-line no-console
+        // console.log(event);
+        events.push(event);
+      },
+    });
+  }, []);
+
+  // this function will send events to the backend and reset the events array
+  function save() {
+    const body = JSON.stringify({ events });
+    console.log('Events body:', body);
+    events = [];
+
+    // fetch('http://YOUR_BACKEND_API', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body,
+    // });
+  }
+
+  // save events every 5 seconds
+  // setInterval(save, 5 * 1000);
+
   if (isLoading) {
     return <LoadingIndicatorPage />;
   }
 
   return (
     <React.Suspense fallback={<LoadingIndicatorPage />}>
+      <button onClick={() => setShouldShowReplay(true)}>View replay</button>
+      {shouldShowReplay && <ReplayComponent events={events}></ReplayComponent>}
       <SkipToContent>
         {formatMessage({ id: 'skipToContent', defaultMessage: 'Skip to content' })}
       </SkipToContent>
@@ -223,6 +282,7 @@ export const App = ({ authLogo, menuLogo, showReleaseNotification, showTutorials
               render={(routerProps) => <AuthPage {...routerProps} hasAdmin={hasAdmin} />}
               exact
             />
+            <PrivateRoute path="/replay" component={ReplayComponent} events={events} />
             <PrivateRoute path="/usecase" component={UseCasePage} />
             <PrivateRoute path="/" component={AuthenticatedApp} />
             <Route path="" component={NotFoundPage} />

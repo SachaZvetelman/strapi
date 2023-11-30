@@ -169,7 +169,7 @@ const ListView = () => {
         title={upperFirst(label)}
         subtitle={formatMessage({
           id: getTrad('listView.headerLayout.description'),
-          defaultMessage: 'Build the data architecture of your content',
+          defaultMessage: 'Sup 2',
         })}
         navigationAction={
           // @ts-expect-error change from Link to alternative non-deprecated component
