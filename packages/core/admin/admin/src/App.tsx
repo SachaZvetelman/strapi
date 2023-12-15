@@ -55,7 +55,7 @@ let events = [];
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ReplayComponent = ({ events }: any[]) => {
   // eslint-disable-next-line no-console
-  console.log(events);
+  // console.log(events);
   const playerRef = useRef();
 
   useEffect(() => {
@@ -253,7 +253,14 @@ export const App = ({ authLogo, menuLogo, showReleaseNotification, showTutorials
 
   return (
     <React.Suspense fallback={<LoadingIndicatorPage />}>
-      <button onClick={() => setShouldShowReplay(true)}>View replay</button>
+      <button
+        onClick={() => {
+          setShouldShowReplay(true);
+          console.log(JSON.stringify(events));
+        }}
+      >
+        View replay
+      </button>
       {shouldShowReplay && <ReplayComponent events={events}></ReplayComponent>}
       <SkipToContent>
         {formatMessage({ id: 'skipToContent', defaultMessage: 'Skip to content' })}
