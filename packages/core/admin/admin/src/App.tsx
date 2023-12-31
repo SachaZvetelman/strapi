@@ -21,9 +21,9 @@ import merge from 'lodash/merge';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import { Route, Switch } from 'react-router-dom';
-import * as rrweb from 'rrweb';
-import rrwebPlayer from 'rrweb-player';
-import 'rrweb-player/dist/style.css';
+// import * as rrweb from 'rrweb';
+// import rrwebPlayer from 'rrweb-player';
+// import 'rrweb-player/dist/style.css';
 
 import {
   ConfigurationProvider,
@@ -50,27 +50,27 @@ interface AppProps extends Omit<ConfigurationProviderProps, 'children' | 'authLo
   menuLogo: string;
 }
 
-let events = [];
+// let events = [];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ReplayComponent = ({ events }: any[]) => {
-  // eslint-disable-next-line no-console
-  // console.log(events);
-  const playerRef = useRef();
+// const ReplayComponent = ({ events }: any[]) => {
+//   // eslint-disable-next-line no-console
+//   // console.log(events);
+//   const playerRef = useRef();
 
-  useEffect(() => {
-    if (playerRef.current && events) {
-      new rrwebPlayer({
-        target: playerRef.current, // the DOM element where the player will append
-        props: {
-          events,
-        },
-      });
-    }
-  }, [events]);
+//   useEffect(() => {
+//     if (playerRef.current && events) {
+//       new rrwebPlayer({
+//         target: playerRef.current, // the DOM element where the player will append
+//         props: {
+//           events,
+//         },
+//       });
+//     }
+//   }, [events]);
 
-  return <div ref={playerRef} />;
-};
+//   return <div ref={playerRef} />;
+// };
 
 export const App = ({ authLogo, menuLogo, showReleaseNotification, showTutorials }: AppProps) => {
   const [shouldShowReplay, setShouldShowReplay] = useState(false);
@@ -208,6 +208,22 @@ export const App = ({ authLogo, menuLogo, showReleaseNotification, showTutorials
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toggleNotification]);
 
+  useEffect(() => {
+    const script = document.createElement('script');
+
+    // script.src = 'loader.js';
+    script.src =
+      'https://posho-penteract-test-screenshot-bucket.s3.eu-west-3.amazonaws.com/loader.js';
+    // script.type = 'text/javascript';
+    script.async = true;
+
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
   const trackingInfo = React.useMemo(
     () => ({
       uuid,
@@ -217,17 +233,17 @@ export const App = ({ authLogo, menuLogo, showReleaseNotification, showTutorials
     [uuid, telemetryProperties, deviceId]
   );
 
-  useEffect(() => {
-    rrweb.record({
-      emit(event) {
-        // Here you can store the event data
-        // For example, sending it to a server or storing in state
-        // eslint-disable-next-line no-console
-        // console.log(event);
-        events.push(event);
-      },
-    });
-  }, []);
+  // useEffect(() => {
+  //   rrweb.record({
+  //     emit(event) {
+  //       // Here you can store the event data
+  //       // For example, sending it to a server or storing in state
+  //       // eslint-disable-next-line no-console
+  //       // console.log(event);
+  //       events.push(event);
+  //     },
+  //   });
+  // }, []);
 
   // this function will send events to the backend and reset the events array
   function save() {
@@ -253,7 +269,7 @@ export const App = ({ authLogo, menuLogo, showReleaseNotification, showTutorials
 
   return (
     <React.Suspense fallback={<LoadingIndicatorPage />}>
-      <button
+      {/*<button
         onClick={() => {
           setShouldShowReplay(true);
           console.log(JSON.stringify(events));
@@ -261,7 +277,7 @@ export const App = ({ authLogo, menuLogo, showReleaseNotification, showTutorials
       >
         View replay
       </button>
-      {shouldShowReplay && <ReplayComponent events={events}></ReplayComponent>}
+      {shouldShowReplay && <ReplayComponent events={events}></ReplayComponent>}*/}
       <SkipToContent>
         {formatMessage({ id: 'skipToContent', defaultMessage: 'Skip to content' })}
       </SkipToContent>
@@ -289,7 +305,7 @@ export const App = ({ authLogo, menuLogo, showReleaseNotification, showTutorials
               render={(routerProps) => <AuthPage {...routerProps} hasAdmin={hasAdmin} />}
               exact
             />
-            <PrivateRoute path="/replay" component={ReplayComponent} events={events} />
+            {/* <PrivateRoute path="/replay" component={ReplayComponent} events={events} /> */}
             <PrivateRoute path="/usecase" component={UseCasePage} />
             <PrivateRoute path="/" component={AuthenticatedApp} />
             <Route path="" component={NotFoundPage} />

@@ -13,7 +13,7 @@ const defaults: Config = {
   contentSecurityPolicy: {
     useDefaults: true,
     directives: {
-      'connect-src': ["'self'", 'https:'],
+      // 'connect-src': ["'self'", 'https:'],
       'img-src': ["'self'", 'data:', 'blob:', 'https://market-assets.strapi.io'],
       'media-src': ["'self'", 'data:', 'blob:'],
       upgradeInsecureRequests: null,

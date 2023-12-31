@@ -1,18 +1,24 @@
 {
   "collectionName": "components_blog_test_comos",
   "info": {
-    "displayName": "test comp",
+    "displayName": "Article",
     "icon": "air-freshener",
     "description": ""
   },
   "options": {},
   "attributes": {
-    "name": {
+    "title": {
       "type": "string",
       "default": "toto"
     },
-    "surname": {
+    "author": {
       "type": "string"
+    },
+    "content": {
+      "type": "blocks"
+    },
+    "published": {
+      "type": "datetime"
     }
   }
 }
